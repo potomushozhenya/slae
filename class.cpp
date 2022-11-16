@@ -4,6 +4,7 @@
 #include "class.h"
 #include "iostream"
 #include "cmath"
+#include "float.h"
 #include "functions.h"
 
 void Matrix::setDimension() {
@@ -58,12 +59,6 @@ Matrix::fptr Matrix::simpleChoice(Matrix &A,std::vector<double>&b,std::vector<do
     (*this)=E+Res;
     mu=-mu;
     c=mu*b;
-    A.print();
-    std::cout<<'\n';
-    for (int i = 0; i < b.size(); ++i) {
-        std::cout<<b[i]<<" ";
-    }
-    std::cout<<'\n';
     if (this->simpleChoiceNorm()!= nullptr){
         Res.del();
         E.del();
@@ -75,7 +70,7 @@ void Matrix::fill() {
     std::cout << "Type matrix elements(move by rows)" << std::endl;
     for (int i = 0; i < dimension; i++) {
         for (int j = 0; j < dimension; j++) {
-            std::cout << "a" << i << j << ' ';
+            std::cout << "a" << i << j <<" ";
             std::cin >> matrix[i][j];
         }
     }
@@ -227,13 +222,234 @@ std::vector<double> simpleIterations( std::vector<double> &vector, Matrix &A,dou
     B.del();
     return xK;
 }
+void Matrix::rowSwap(int a,int b){
+    double* tmpRow=this->matrix[a];
+    this->matrix[a]=this->matrix[b];
+    this->matrix[b]=tmpRow;
+}
+std::vector<double> Matrix::Y(Matrix &P, std::vector<double> &b){
+    std::vector<double> pb=P*b;
+    std::vector<double> y;
+    y.resize(pb.size());
+    double s;
+    for (int i = 0; i < this->dimension; ++i) {
+        s=0;
+        for (int j = 0; j < i; ++j) {
+            s+=y[j]*(this->matrix[i][j]);
+        }
+        y[i]=pb[i]-s;
+    }
+    return y;
+}
+std::vector<double> Matrix::X(std::vector<double> &y){
+    std::vector<double> x;
+    x.resize(y.size());
+    double s;
+    for (int i = (this->dimension)-1; i > -1; --i) {
+        s=0;
+        int j;
+        for (j = (this->dimension)-1; j > i; --j) {
+            s+=x[j]*(this->matrix[i][j]);
+        }
+        x[i]=(y[i]-s)/(this->matrix[i][j]);
+    }
+    return x;
+}
 std::vector<double> LU(Matrix& A,std::vector<double> &b){
     Matrix P;
     P.newMatrix(A.dimension);
     P.E();
     Matrix LU;
+    LU.newMatrix(A.dimension);
     LU=A;
-    
-
-
+    //LU.rowChange(0,1);
+    int maxElemIndex=0;
+    double maxElem=-1;
+    for (int i = 0; i < LU.dimension; ++i) {
+        for (int j = i; j < LU.dimension; ++j) {
+            if (std::abs(LU.matrix[j][i])>maxElem){
+                maxElem=std::abs(LU.matrix[j][i]);
+                maxElemIndex=j;
+            }
+        }
+        if (maxElemIndex!=i){
+            LU.rowSwap(i,maxElemIndex);
+            P.rowSwap(i,maxElemIndex);
+        }
+        for (int j = i+1; j < LU.dimension; ++j) {
+            LU.matrix[j][i]=(LU.matrix[j][i])/(LU.matrix[i][i]);
+            for (int k = i+1; k < LU.dimension; ++k) {
+                LU.matrix[j][k]=LU.matrix[j][k]-(LU.matrix[j][i]*LU.matrix[i][k]);
+            }
+        }
+    }
+    std::vector<double> y= LU.Y(P,b);
+    std::vector<double> x=LU.X(y);
+    P.del();
+    LU.del();
+    return x;
+}
+bool Matrix::diagonal_predominance(){
+    int i;
+    double s;
+    for (i = 0; i < this->dimension; ++i) {
+        s=0;
+        for (int j = 0; j < this->dimension; ++j) {
+            if(i!=j) {
+                s += std::abs(this->matrix[i][j]);
+            }
+        }
+        if(std::abs(this->matrix[i][i])<=s){
+            break;
+        }
+    }
+    if(i==(this->dimension)){
+        return true;
+    } else{
+        return false;
+    }
+}
+void Matrix::positively_define(std::vector<double> &b){
+    Matrix AT;
+    AT.newMatrix(this->dimension);
+    AT=this->transposition();
+    (*this)=AT*(*this);
+    b=AT*b;
+    AT.del();
+}
+std::vector<double> Seidel(Matrix &A,std::vector<double> &b,double eps){
+    if(!A.diagonal_predominance()){
+        A.positively_define(b);
+    }
+    bool Flag=true;
+    std::vector<double> xK;
+    std::vector<double> d;
+    d.resize(A.dimension);
+    for (int i = 0; i < d.size(); ++i) {
+        d[i]=(b[i])/(A.matrix[i][i]);
+    }
+    xK=d;
+    while(Flag){
+        double s;
+        for (int i = 0; i < A.dimension; ++i) {
+            s=0;
+            for (int j = 0; j < A.dimension; ++j) {
+                if(i!=j){
+                    s+=((-(A.matrix[i][j]))/(A.matrix[i][i]))*xK[j];
+                }
+            }
+            s+=d[i];
+            xK[i]=s;
+        }
+        std::vector<double> tmpVec=A*xK;
+        tmpVec=tmpVec-b;
+        if (Norm(tmpVec)<eps){
+            Flag=false;
+        }
+    }
+    return xK;
+}
+Matrix doubleW(std::vector<double>w1,std::vector<double>w2){
+    Matrix matrix;
+    matrix.newMatrix(w1.size());
+    for (int i = 0; i < w1.size(); ++i) {
+        for (int j = 0; j < w1.size(); ++j) {
+            matrix.matrix[i][j]=-2*(w1[i]*w1[j]);
+        }
+    }
+    return matrix;
+}
+void Matrix::insertion(Matrix& Q){
+    int diff=(this->dimension-Q.dimension);
+    for (int i = (this->dimension-1); i > diff-1; --i) {
+        for (int j = (this->dimension-1); j >diff-1; --j) {
+            this->matrix[i][j]=Q.matrix[i-diff][j-diff];
+        }
+    }
+};
+std::vector<double> QR(Matrix &A, std::vector<double> &b){
+    Matrix R;
+    R.newMatrix(A.dimension);
+    R=A;
+    Matrix QSummary;
+    Matrix Q;
+    QSummary.newMatrix(A.dimension);
+    Q.newMatrix(A.dimension);
+    Q.E();
+    QSummary=Q;
+    std::vector<double> w;
+    std::vector<double> y;
+    std::vector<double> z;
+    y.resize(A.dimension);
+    z.resize(A.dimension);
+    z[0]=1;
+    w.resize(A.dimension);
+    for (int i = 0; i < (A.dimension-1); ++i) {
+        //find y
+        y.resize(A.dimension-i);
+        z.resize(A.dimension-i);
+        for (int j = (A.dimension-1); j > i-1; --j) {
+            y[j-i]=R.matrix[j][i];
+            std::cout<<R.matrix[j][i]<<' '<<i<<' '<<j<<std::endl;
+        }
+        std::cout<<"Vector y"<<std::endl;
+        for (int j = 0; j < y.size(); ++j) {
+            std::cout<<y[j]<<" ";
+        }
+        std::cout<<'\n';
+        double a=Norm(y);
+        std::vector<double>tmpVec= (-a)*z;
+        tmpVec=y+tmpVec;
+        //y-(a*z)
+        double ro=Norm(tmpVec);
+        tmpVec=(1/ro)*y;
+        w=(-a/ro)*z;
+        w=w+tmpVec;
+        std::cout<<"Vector w"<<std::endl;
+        for (int j = 0; j < w.size(); ++j) {
+            std::cout<<w[j]<<" ";
+        }
+        std::cout<<'\n';
+        Matrix E;
+        E.newMatrix(A.dimension-i);
+        E.E();
+        Matrix W;
+        Matrix QAdd;
+        QAdd.newMatrix(A.dimension);
+        QAdd.E();
+        W.newMatrix(A.dimension-i);
+        W= doubleW(w,w);
+        Q=E+W;
+        Q.print();
+        QAdd.insertion(Q);
+        std::cout<<"Matrix QAdd"<<std::endl;
+        QAdd.print();
+        std::cout<<'\n';
+        R=QAdd*R;
+        std::cout<<"Matrix R"<<std::endl;
+        R.print();
+        std::cout<<'\n';
+        QSummary=QSummary*QAdd;
+        W.del();
+        QAdd.del();
+        E.del();
+    }
+    QSummary.print();
+    std::cout<<'\n';
+    R.print();
+    QSummary=QSummary.transposition();
+    std::vector<double> ResAdd=QSummary*b;
+    std::vector<double> result;
+    result.resize(A.dimension);
+    for (int i = (A.dimension-1); i > -1 ; --i) {
+        double s=0;
+        for (int j = (A.dimension-1); j > i ; --j) {
+            s+=result[j]*R.matrix[i][j];
+        }
+        result[i]=(ResAdd[i]-s)/R.matrix[i][i];
+    }
+    Q.del();
+    QSummary.del();
+    R.del();
+    return result;
 }
