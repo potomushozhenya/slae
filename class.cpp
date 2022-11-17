@@ -6,6 +6,7 @@
 #include "cmath"
 #include "float.h"
 #include "functions.h"
+#include <iomanip>
 
 void Matrix::setDimension() {
     std::cout << "Type dimension od matrix" << std::endl;
@@ -183,7 +184,8 @@ void Matrix::E(){
 int Matrix::getDimension(){
     return this->dimension;
 }
-std::vector<double> simpleIterations( std::vector<double> &vector, Matrix &A,double eps) {
+std::vector<double> simpleIterations( std::vector<double> &vector, Matrix &A,double eps, int& k) {
+    k=0;
     Matrix B;
     B.dimension=A.dimension;
     B.initialization();
@@ -202,6 +204,7 @@ std::vector<double> simpleIterations( std::vector<double> &vector, Matrix &A,dou
             xK = x0 + c;
             xKk = xK - xk;
             xk=xK;
+            ++k;
             if ((Num * Norm(xKk)) < eps) {
                 Flag = false;
             }
@@ -214,6 +217,7 @@ std::vector<double> simpleIterations( std::vector<double> &vector, Matrix &A,dou
             Result=A*xK;
             Result=(Result-vector);
             xk=xK;
+            ++k;
             if (Norm(Result)<eps) {
                 Flag = false;
             }
@@ -266,6 +270,8 @@ std::vector<double> LU(Matrix& A,std::vector<double> &b){
     int maxElemIndex=0;
     double maxElem=-1;
     for (int i = 0; i < LU.dimension; ++i) {
+        maxElemIndex=0;
+        maxElem=-1;
         for (int j = i; j < LU.dimension; ++j) {
             if (std::abs(LU.matrix[j][i])>maxElem){
                 maxElem=std::abs(LU.matrix[j][i]);
@@ -317,10 +323,11 @@ void Matrix::positively_define(std::vector<double> &b){
     b=AT*b;
     AT.del();
 }
-std::vector<double> Seidel(Matrix &A,std::vector<double> &b,double eps){
+std::vector<double> Seidel(Matrix &A,std::vector<double> &b,double eps,int& k){
     if(!A.diagonal_predominance()){
         A.positively_define(b);
     }
+    k=0;
     bool Flag=true;
     std::vector<double> xK;
     std::vector<double> d;
@@ -331,6 +338,7 @@ std::vector<double> Seidel(Matrix &A,std::vector<double> &b,double eps){
     xK=d;
     while(Flag){
         double s;
+        ++k;
         for (int i = 0; i < A.dimension; ++i) {
             s=0;
             for (int j = 0; j < A.dimension; ++j) {
@@ -452,4 +460,139 @@ std::vector<double> QR(Matrix &A, std::vector<double> &b){
     QSummary.del();
     R.del();
     return result;
+}
+void Matrix::newMatrix1(std::vector<double> &b,std::vector<double>& solution){
+    (*this).newMatrix(3);
+    b.resize(this->dimension);
+    solution.resize(this->dimension);
+    this->matrix[0][0]=0;
+    this->matrix[0][1]=2;
+    this->matrix[0][2]=3;
+    this->matrix[1][0]=1;
+    this->matrix[1][1]=2;
+    this->matrix[1][2]=4;
+    this->matrix[2][0]=4;
+    this->matrix[2][1]=5;
+    this->matrix[2][2]=6;
+    b[0]=13;
+    b[1]=17;
+    b[2]=32;
+    solution[0]=1;
+    solution[1]=2;
+    solution[2]=3;
+}
+void Matrix::newMatrix2(std::vector<double> &b,std::vector<double>& solution){
+    (*this).newMatrix(3);
+    b.resize(this->dimension);
+    solution.resize(this->dimension);
+    this->matrix[0][0]=7;
+    this->matrix[0][1]=1;
+    this->matrix[0][2]=1;
+    this->matrix[1][0]=1;
+    this->matrix[1][1]=9;
+    this->matrix[1][2]=1;
+    this->matrix[2][0]=1;
+    this->matrix[2][1]=1;
+    this->matrix[2][2]=11;
+    b[0]=9;
+    b[1]=11;
+    b[2]=13;
+    solution[0]=1;
+    solution[1]=1;
+    solution[2]=1;
+}
+void Matrix::newMatrix3(std::vector<double> &b,std::vector<double>& solution){
+    (*this).newMatrix(3);
+    b.resize(this->dimension);
+    solution.resize(this->dimension);
+    this->matrix[0][0]=-7;
+    this->matrix[0][1]=1;
+    this->matrix[0][2]=1;
+    this->matrix[1][0]=1;
+    this->matrix[1][1]=-9;
+    this->matrix[1][2]=1;
+    this->matrix[2][0]=1;
+    this->matrix[2][1]=1;
+    this->matrix[2][2]=-11;
+    b[0]=-9;
+    b[1]=-11;
+    b[2]=-13;
+    solution[0]=(1.7228915662650602);
+    solution[1]=(1.5783132530120481);
+    solution[2]=(1.4819277108433734);
+}
+void Matrix::newMatrix4(std::vector<double> &b,std::vector<double>& solution){
+    (*this).newMatrix(3);
+    b.resize(this->dimension);
+    solution.resize(this->dimension);
+    this->matrix[0][0]=-7;
+    this->matrix[0][1]=8;
+    this->matrix[0][2]=9;
+    this->matrix[1][0]=10;
+    this->matrix[1][1]=-9;
+    this->matrix[1][2]=6;
+    this->matrix[2][0]=9;
+    this->matrix[2][1]=10;
+    this->matrix[2][2]=-11;
+    b[0]=9;
+    b[1]=11;
+    b[2]=13;
+    solution[0]=(1.4940029985007496);
+    solution[1]=(1.1799100449775112);
+    solution[2]=(1.1131934032983508);
+}
+void Matrix::newMatrix5(std::vector<double> &b,std::vector<double>& solution){
+    (*this).newMatrix(3);
+    b.resize(this->dimension);
+    solution.resize(this->dimension);
+    this->matrix[0][0]=7;
+    this->matrix[0][1]=6;
+    this->matrix[0][2]=6;
+    this->matrix[1][0]=6;
+    this->matrix[1][1]=9;
+    this->matrix[1][2]=6;
+    this->matrix[2][0]=6;
+    this->matrix[2][1]=6;
+    this->matrix[2][2]=11;
+    b[0]=9;
+    b[1]=11;
+    b[2]=13;
+    solution[0]=(0.0196078431372549);
+    solution[1]=(0.6732026143790849);
+    solution[2]=(0.8039215686274509);
+}
+void Matrix::newMatrix6(int n, double epsilon,std::vector<double>&b,std::vector<double>&solution) {
+    (*this).dimension=n;
+    (*this).initialization();
+    b.resize(this->dimension);
+    solution.resize(this->dimension);
+    double eps=epsilon*5;
+    for (int i = 0; i < this->dimension; ++i) {
+        for (int j = 0; j < this->dimension; ++j) {
+            if(i<j) {
+                this->matrix[i][j] = (-eps) - 1;
+                continue;
+            }
+            if (i>j){
+                this->matrix[i][j]=eps;
+                continue;
+            } else{
+                this->matrix[i][j]=eps+1;
+            }
+        }
+    }
+    for (int i = 0; i < b.size(); ++i) {
+        if(i!=b.size()-1){
+            b[i]=-1;
+        } else{
+            b[i]=1;
+        }
+    }
+    for (int i = 0; i < solution.size(); ++i) {
+        if(i!=b.size()-1){
+            solution[i]=0;
+        } else{
+            solution[i]=0.995024875621890547;
+        }
+    }
 }

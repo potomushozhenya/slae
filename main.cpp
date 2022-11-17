@@ -11,50 +11,87 @@ int main() {
     std::cout << "3- LU" << std::endl;
     std::cout << "4- QR" << std::endl;
     std::cin >> var;
-    Matrix A;
-    A.newMatrix();
+    Matrix P;
     std::vector<double> b;
-    b.resize(A.getDimension());
+    P.newMatrix();
+    b.resize(P.getDimension());
     std::cout<<"Type vector elements "<<std::endl;
     for (double & i : b) {
         std::cin>>i;
     }
+    int k;
+    /*int n=10;
+    double epsilon=0.000001;
+    std::vector<double> solution;
+    P.newMatrix6(n,epsilon,b,solution);*/
     switch (var) {
         case (1): {
             double eps;
             std::cout<<"Type epsilon\t";
             std::cin>>eps;
-            std::vector<double> otvet= simpleIterations(b,A,eps);
+            std::vector<double> otvet= simpleIterations(b,P,eps,k);
             for (int i = 0; i < otvet.size(); ++i) {
-                std::cout << std::setprecision(16)<< otvet[i] << " ";
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<otvet[i] << " ";
             }
+            /*std::cout<<std::endl<<"k:"<<k<<std::endl;
+            for (int i = 0; i < solution.size(); ++i) {
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<std::abs(otvet[i]-solution[i]) << " ";
+            }
+            std::cout<<std::endl;
+            for (int i = 0; i < solution.size(); ++i) {
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<solution[i]<< " ";
+            }*/
             break;
         }
         case (2): {
             double eps;
             std::cout<<"Type epsilon\t";
             std::cin>>eps;
-            std::vector<double> otvet= Seidel(A,b,eps);
+            std::vector<double> otvet= Seidel(P,b,eps,k);
             for (int i = 0; i < otvet.size(); ++i) {
-                std::cout << std::setprecision(16)<<otvet[i] << " ";
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<otvet[i] << " ";
             }
+            std::cout<<std::endl<<"k:"<<k<<std::endl;
+            /*for (int i = 0; i < solution.size(); ++i) {
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<std::abs(otvet[i]-solution[i]) << " ";
+            }
+            std::cout<<std::endl;
+            for (int i = 0; i < solution.size(); ++i) {
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<solution[i]<< " ";
+            }*/
             break;
         }
         case (3): {
-            std::vector<double> otvet= LU(A,b);
+            std::vector<double> otvet= LU(P,b);
             for (int i = 0; i < otvet.size(); ++i) {
-                std::cout << std::setprecision(16)<<otvet[i] << " ";
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<otvet[i] << " ";
             }
+            /*std::cout<<std::endl;
+            for (int i = 0; i < solution.size(); ++i) {
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<std::abs(otvet[i]-solution[i]) << " ";
+            }
+            std::cout<<std::endl;
+            for (int i = 0; i < solution.size(); ++i) {
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<solution[i]<< " ";
+            }*/
             break;
         }
         case (4): {
-            std::vector<double> otvet= QR(A,b);
+            std::vector<double> otvet= QR(P,b);
             for (int i = 0; i < otvet.size(); ++i) {
-                std::cout << std::setprecision(16)<<otvet[i] << " ";
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<otvet[i] << " ";
             }
+            /*std::cout<<std::endl;
+            for (int i = 0; i < solution.size(); ++i) {
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<std::abs(otvet[i]-solution[i]) << " ";
+            }
+            std::cout<<std::endl;
+            for (int i = 0; i < solution.size(); ++i) {
+                std::cout << std::setprecision(16)<<"x"<<i+1<<"="<<solution[i]<< " ";
+            }*/
             break;
         }
     }
-    A.del();
+    P.del();
     return 0;
 }

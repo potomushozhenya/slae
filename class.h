@@ -35,12 +35,18 @@ public:
     fptr simpleChoice(Matrix &A,std::vector<double>&b,std::vector<double>&c);
     Matrix::fptr simpleChoiceNorm();
     void positively_define(std::vector<double> &b);
-    friend std::vector<double> Seidel(Matrix &A,std::vector<double> &b,double eps);
+    friend std::vector<double> Seidel(Matrix &A,std::vector<double> &b,double eps, int& k);
     friend std::vector<double> operator*(Matrix&A,std::vector<double>& vector);
-    friend std::vector<double> simpleIterations( std::vector<double> &vector, Matrix &matrix,double eps);
+    friend std::vector<double> simpleIterations( std::vector<double> &vector, Matrix &matrix,double eps, int& k);
     friend std::vector<double> LU(Matrix& A,std::vector<double> &b);
     friend Matrix doubleW(std::vector<double>w1,std::vector<double>w2);
     void insertion(Matrix&Q);
+    void newMatrix1(std::vector<double> &b,std::vector<double>& solution);
+    void newMatrix2(std::vector<double> &b,std::vector<double>& solution);
+    void newMatrix3(std::vector<double> &b,std::vector<double>& solution);
+    void newMatrix4(std::vector<double> &b,std::vector<double>& solution);
+    void newMatrix5(std::vector<double> &b,std::vector<double>& solution);
+    void newMatrix6(int n, double eps,std::vector<double>&b,std::vector<double>&solution);
     friend std::vector<double> QR(Matrix& A, std::vector<double> &b);
 };
 
