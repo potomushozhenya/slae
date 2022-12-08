@@ -4,9 +4,7 @@
 #include "class.h"
 #include "iostream"
 #include "cmath"
-#include "float.h"
 #include "functions.h"
-#include <iomanip>
 
 void Matrix::setDimension() {
     std::cout << "Type dimension od matrix" << std::endl;
