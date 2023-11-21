@@ -1,5 +1,6 @@
 # ninja log v5
-2	812	6910033994785068	CMakeFiles/slae.dir/class.cpp.obj	66e1cba4a6e34b2c
-3	783	6903976367504611	CMakeFiles/slae.dir/main.cpp.obj	ac7a0ce14267d785
-5	431	6903933034034524	CMakeFiles/slae.dir/functions.cpp.obj	878fc316bbe7dbe0
-813	1109	6910033997715715	slae.exe	98b101494a48a9c0
+8	1353	7134683571883642	CMakeFiles/slae.dir/class.cpp.obj	b3109777e6ebe851
+3	1332	7134683571673597	CMakeFiles/slae.dir/main.cpp.obj	bf99988e09b078d3
+12	1330	7134683571653494	CMakeFiles/slae.dir/functions.cpp.obj	7826f3bde2a43e3f
+1354	1674	7134683575044680	slae.exe	98b101494a48a9c0
+28	457	7161299166536660	build.ninja	b93ad1dbfdd599fc
